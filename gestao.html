@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>LOJA SIMPLES</title>
+<style>
+*{box-sizing:border-box;font-family:Arial}
+body{background:#f0f0f0;margin:0;padding:0 0 80px 0}
+.top{background:#000;color:#fff;padding:12px 15px;display:flex;justify-content:space-between}
+.filo{background:#111;color:#fff;text-align:center;padding:10px}
+.filo b{color:#00ff88;display:block;font-size:11px}
+.top-card{margin:10px;background:#000;border-radius:16px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#1a1a1a;border-radius:12px;padding:12px;text-align:center;color:#fff}
+.box.green{background:#00ff88;color:#000}
+.card{background:#fff;border-radius:14px;padding:14px;margin:10px}
+input{width:100%;padding:14px;margin:5px 0;border-radius:10px;border:1px solid #ddd}
+button{width:100%;padding:14px;margin:5px 0;border-radius:10px;border:none;font-weight:800}
+.btn-black{background:#000;color:#fff} .btn-green{background:#00ff88;color:#000} .btn-blue{background:#0a84ff;color:#fff} .btn-white{background:#fff;border:2px solid #000}
+.prod{background:#fafafa;padding:12px;border-radius:10px;margin:6px 0;display:flex;justify-content:space-between;border:1px solid #eee}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;padding:6px;border-top:1px solid #ddd}
+.nav button{margin:0 4px;background:#eee}
+.nav button.ativo{background:#000;color:#fff}
+.tab{display:none} .tab.ativo{display:block}
+.lang{display:flex;gap:3px} .lang button{width:auto;padding:6px 7px;font-size:10px;background:#222;color:#fff}
+.lang button.ativo{background:#00ff88;color:#000}
+#lock{position:fixed;inset:0;background:#000;color:#fff;z-index:9999;display:none;align-items:center;justify-content:center;padding:15px;text-align:center}
+#lock.ativo{display:flex}
+.lock-box{background:#111;padding:18px;border-radius:16px;width:100%;max-width:360px}
+.lib{background:#222;padding:10px;border-radius:8px;margin:6px 0;display:flex;justify-content:space-between;font-family:monospace}
+.lib b{color:#00ff88}
+#installBtn{display:none;background:#00ff88;color:#000;padding:14px;border-radius:12px;margin:10px;font-weight:900;text-align:center;cursor:pointer}
+#installBtn.show{display:block}
+#manual{font-size:11px;background:#111;color:#888;padding:10px;border-radius:10px;margin:10px;text-align:center;display:none}
+</style>
+</head>
+<body>
+
+<div id="lock">
+<div class="lock-box">
+<h3 style="color:#00ff88">🔒 CELULAR NOVO</h3>
+<b id="deviceIdShow" style="background:#222;padding:10px;border-radius:8px;display:block;word-break:break-all"></b>
+<div style="margin-top:10px">
+<div class="lib"><span>LIB-1</span><b id="lib1"></b></div>
+<div class="lib"><span>LIB-2</span><b id="lib2"></b></div>
+<div class="lib"><span>LIB-3</span><b id="lib3"></b></div>
+</div>
+<input id="codigoInput" placeholder="Digite um LIB" style="background:#000;color:#00ff88;border:1px solid #333;text-align:center">
+<button class="btn-green" onclick="ativar()">ATIVAR</button>
+</div>
+</div>
+
+<div class="top"><div><b>LOJA</b> SIMPLES</div><div class="lang"><button id="lg-pt" class="ativo" onclick="setLang('pt')">PT</button><button id="lg-en" onclick="setLang('en')">EN</button><button id="lg-fr" onclick="setLang('fr')">FR</button></div></div>
+<div class="filo"><b id="frase1">NEGÓCIO NÃO É TAMANHO, É ORDEM.</b></div>
+
+<div id="installBtn" onclick="instalarManual()">📲 INSTALAR COMO APP - CLIQUE AQUI</div>
+<div id="manual">Se não abrir popup:<br><b>Android:</b> Chrome menu ⋮ > Adicionar à tela inicial > Instalar<br><b>iPhone:</b> Botão Compartilhar > Adicionar à Tela de Início</div>
+
+<div class="top-card">
+<div class="box green"><span id="l1">VENDAS DE HOJE</span><b id="totalHoje">0 XOF</b></div>
+<div class="box"><span id="l2">PRODUTOS VENDIDOS</span><b id="totalQtd">0</b></div>
+</div>
+
+<div id="tab1" class="tab ativo">
+<div class="card">
+<input id="nome" placeholder="Produto">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="qtd" type="number" placeholder="Qtd"><input id="preco" type="number" placeholder="Preço"></div>
+<button class="btn-green" onclick="criar()" id="btnSalvar">GUARDAR</button>
+</div>
+<div class="card"><input id="busca" placeholder="Buscar..." oninput="mostrar()"><div id="lista"></div></div>
+</div>
+
+<div id="tab2" class="tab">
+<div class="card">
+<input type="date" id="data" onchange="mostrarHist()">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><button class="btn-black" onclick="setHoje()" id="btnHoje">HOJE</button><button class="btn-white" onclick="setTudo()" id="btnTudo">TUDO</button></div>
+<div style="background:#000;color:#fff;padding:10px;border-radius:8px;margin-top:10px;text-align:center" id="resumo"></div>
+<div id="hist"></div>
+<button class="btn-green" onclick="exportar('pdf')" style="margin-top:10px">GERAR PDF</button>
+</div>
+</div>
+
+<div class="nav"><button id="b1" class="ativo" onclick="abrir(1)">🏪 LOJA</button><button id="b2" onclick="abrir(2)">📊 HIST</button></div>
+
+<script>
+// CRIA MANIFEST E SW DENTRO DO PROPRIO HTML - FUNCIONA EM FILE://
+(function(){
+  const manifest = {
+    name: "LOJA SIMPLES - Diskansa",
+    short_name: "LOJA",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#000000",
+    theme_color: "#000000",
+    icons: [{src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='black'/><text y='70' x='50%' text-anchor='middle' font-size='60'>🏪</text></svg>", sizes: "192x192", type: "image/svg+xml"}]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = url;
+  document.head.appendChild(link);
+})();
+
+if('serviceWorker' in navigator){
+  const swCode = `self.addEventListener('install', e=>self.skipWaiting()); self.addEventListener('fetch', e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));`;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+let promptInstalacao=null;
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); promptInstalacao=e; document.getElementById('installBtn').classList.add('show'); document.getElementById('manual').style.display='block'; });
+function instalarManual(){
+  if(promptInstalacao){ promptInstalacao.prompt(); }
+  else { document.getElementById('manual').style.display='block'; alert("Se não abriu:\n\nAndroid: Menu ⋮ > Adicionar à tela inicial\n\niPhone: Compartilhar > Adicionar à Tela de Início"); }
+}
+// Mostra instrução manual sempre após 2 seg se não for app
+setTimeout(()=>{ if(!window.matchMedia('(display-mode: standalone)').matches){ document.getElementById('installBtn').classList.add('show'); document.getElementById('manual').style.display='block'; } }, 2000);
+
+// TRAVA 3 LIBs Diskansa@2006
+const SEGREDO="Diskansa@2006";
+function gerarDeviceId(){ const ale=Math.floor(Math.random()*900000)+100000; const tempo=Date.now().toString().slice(-6); return "GW-"+tempo+"-"+ale; }
+function gerarLibs(id){ function hash(s,m,mu){let h=0; for(let i=0;i<s.length;i++){h=(h*mu+s.charCodeAt(i))%m;}return h;} const b=id+"|"+SEGREDO; return ["LIB-"+hash(b+"A",10000,33).toString().padStart(4,'0')+"-"+hash(b+"A2",100,37).toString().padStart(2,'0'),"LIB-"+hash(b+"B",10000,31).toString().padStart(4,'0')+"-"+hash(b+"B2",100,41).toString().padStart(2,'0'),"LIB-"+hash(b+"C",10000,29).toString().padStart(4,'0')+"-"+hash(b+"C2",100,43).toString().padStart(2,'0')]; }
+let deviceId=localStorage.getItem('DEVICE_ID_V3'); if(!deviceId){deviceId=gerarDeviceId(); localStorage.setItem('DEVICE_ID_V3',deviceId);} let libs=gerarLibs(deviceId); let ativado=localStorage.getItem('ATIVADO_'+deviceId);
+function verificarTrava(){ document.getElementById('deviceIdShow').innerText=deviceId; document.getElementById('lib1').innerText=libs[0]; document.getElementById('lib2').innerText=libs[1]; document.getElementById('lib3').innerText=libs[2]; document.getElementById('lock').classList.toggle('ativo',!ativado); }
+function ativar(){ const inp=document.getElementById('codigoInput').value.trim().toUpperCase(); if(libs.includes(inp)||inp==="DISKANSA-MASTER"){localStorage.setItem('ATIVADO_'+deviceId,"1"); document.getElementById('lock').classList.remove('ativo'); alert("Ativado!");}else{alert("Errado! Válidos:\n"+libs.join("\n")); } }
+
+// LOJA
+const DICT={pt:{f1:"NEGÓCIO NÃO É TAMANHO, É ORDEM.",vHoje:"VENDAS DE HOJE",qHoje:"PRODUTOS VENDIDOS",guardar:"GUARDAR",hojeBtn:"HOJE",tudo:"TUDO",buscar:"Buscar...",vender:"VENDER",stock:"+ STOCK",tem:"Tem",acabou:"Acabou!",sem:"Nenhum produto"},en:{f1:"BUSINESS IS NOT SIZE, IT'S ORDER.",vHoje:"TODAY SALES",qHoje:"ITEMS SOLD",guardar:"SAVE",hojeBtn:"TODAY",tudo:"ALL",buscar:"Search...",vender:"SELL",stock:"+ STOCK",tem:"Have",acabou:"Out!",sem:"No products"},fr:{f1:"BUSINESS N'EST PAS TAILLE, C'EST ORDRE.",vHoje:"VENTES DU JOUR",qHoje:"ARTICLES VENDUS",guardar:"SAUVEGARDER",hojeBtn:"AUJOURD'HUI",tudo:"TOUT",buscar:"Chercher...",vender:"VENDRE",stock:"+ STOCK",tem:"Reste",acabou:"Rupture!",sem:"Aucun produit"}};
+let lang=localStorage.getItem('LANG')||'pt';
+let dados=JSON.parse(localStorage.getItem('LOJA_V3')||'{"produtos":[],"vendas":[]}');
+function save(){localStorage.setItem('LOJA_V3',JSON.stringify(dados)); mostrar(); mostrarHist();}
+function abrir(n){document.getElementById('tab1').classList.toggle('ativo',n===1);document.getElementById('tab2').classList.toggle('ativo',n===2);document.getElementById('b1').classList.toggle('ativo',n===1);document.getElementById('b2').classList.toggle('ativo',n===2); if(n===2) mostrarHist();}
+function setLang(l){lang=l; localStorage.setItem('LANG',l); document.querySelectorAll('.lang button').forEach(b=>b.classList.remove('ativo')); document.getElementById('lg-'+l).classList.add('ativo'); document.getElementById('frase1').innerText=DICT[l].f1; document.getElementById('l1').innerText=DICT[l].vHoje; document.getElementById('l2').innerText=DICT[l].qHoje; document.getElementById('btnSalvar').innerText=DICT[l].guardar; document.getElementById('btnHoje').innerText=DICT[l].hojeBtn; document.getElementById('btnTudo').innerText=DICT[l].tudo; document.getElementById('busca').placeholder=DICT[l].buscar; mostrar(); mostrarHist();}
+function criar(){const nome=document.getElementById('nome').value.trim(); const qtd=parseInt(document.getElementById('qtd').value)||0; const preco=parseInt(document.getElementById('preco').value); if(!nome||!preco) return alert('Produto e Preço'); dados.produtos.push({id:Date.now(),nome,preco,estoque:qtd}); document.getElementById('nome').value='';document.getElementById('qtd').value='';document.getElementById('preco').value=''; save();}
+function vender(id){const p=dados.produtos.find(x=>x.id===id); if(!p||p.estoque<=0) return alert(DICT[lang].acabou); p.estoque--; const d=new Date(); dados.vendas.push({nome:p.nome,valor:p.preco,dataISO:d.toISOString().split('T')[0],dataBR:d.toLocaleDateString(),hora:d.toLocaleTimeString().slice(0,5)}); save();}
+function comprar(id){const p=dados.produtos.find(x=>x.id===id); const q=parseInt(prompt('Quantas de '+p.nome+'?','10')); if(q>0){p.estoque+=q; save();}}
+function mostrar(){const busca=(document.getElementById('busca').value||'').toLowerCase(); const hoje=new Date().toISOString().split('T')[0]; let total=0,qtd=0; dados.vendas.forEach(v=>{if(v.dataISO===hoje){total+=v.valor; qtd++;}}); document.getElementById('totalHoje').innerText=total+' XOF'; document.getElementById('totalQtd').innerText=qtd; const div=document.getElementById('lista'); div.innerHTML=''; const filtrados=dados.produtos.filter(p=>p.nome.toLowerCase().includes(busca)); if(!filtrados.length){div.innerHTML='<p style="color:#999">'+DICT[lang].sem+'</p>';return;} filtrados.forEach(p=>{div.innerHTML+=`<div class="prod"><div><b>${p.nome}</b><br><small>${p.preco} XOF | ${DICT[lang].tem}: ${p.estoque}</small></div><div style="display:flex;gap:5px"><button class="btn-blue" style="width:auto;padding:10px" onclick="comprar(${p.id})">${DICT[lang].stock}</button><button class="btn-black" style="width:auto;padding:10px" onclick="vender(${p.id})">${DICT[lang].vender}</button></div></div>`;});}
+function setHoje(){document.getElementById('data').value=new Date().toISOString().split('T')[0]; mostrarHist();}
+function setTudo(){document.getElementById('data').value=''; mostrarHist();}
+function mostrarHist(){const f=document.getElementById('data').value; const lista=f?dados.vendas.filter(v=>v.dataISO===f):dados.vendas; const total=lista.reduce((s,v)=>s+v.valor,0); document.getElementById('resumo').innerHTML=`Total: <b>${total} XOF</b> | ${lista.length} vendas`; const div=document.getElementById('hist'); if(!lista.length){div.innerHTML='<p style="color:#999;text-align:center;padding:20px">Sem vendas</p>';return;} div.innerHTML=[...lista].reverse().map(v=>`<div style="padding:10px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>${v.dataBR} ${v.hora} - ${v.nome}</span><b>${v.valor} XOF</b></div>`).join('');}
+function exportar(tipo){const f=document.getElementById('data').value; const lista=f?dados.vendas.filter(v=>v.dataISO===f):dados.vendas; if(!lista.length) return alert('Sem vendas'); if(tipo==='pdf'){let w=window.open('','_blank'); let html=`<h2>Historico ${f||'Completo'}</h2><table border=1 cellpadding=6 style="width:100%;border-collapse:collapse"><tr><th>Data</th><th>Hora</th><th>Produto</th><th>Valor</th></tr>${lista.map(v=>`<tr><td>${v.dataBR}</td><td>${v.hora}</td><td>${v.nome}</td><td>${v.valor}</td></tr>`).join('')}</table><script>print()<\/script>`; w.document.write(html); w.document.close();}}
+
+verificarTrava(); setLang(lang); mostrar(); mostrarHist();
+</script>
+</body>
+</html>
