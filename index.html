@@ -146,6 +146,25 @@ function setHoje(){document.getElementById('data').value=new Date().toISOString(
 function setTudo(){document.getElementById('data').value=''; mostrarHist();}
 function mostrarHist(){const f=document.getElementById('data').value; const lista=f?dados.vendas.filter(v=>v.dataISO===f):dados.vendas; const total=lista.reduce((s,v)=>s+v.valor,0); document.getElementById('resumo').innerHTML=`Total: <b>${total} XOF</b> | ${lista.length} vendas`; const div=document.getElementById('hist'); if(!lista.length){div.innerHTML='<p style="color:#999;text-align:center;padding:20px">Sem vendas</p>';return;} div.innerHTML=[...lista].reverse().map(v=>`<div style="padding:10px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>${v.dataBR} ${v.hora} - ${v.nome}</span><b>${v.valor} XOF</b></div>`).join('');}
 function exportar(tipo){const f=document.getElementById('data').value; const lista=f?dados.vendas.filter(v=>v.dataISO===f):dados.vendas; if(!lista.length) return alert('Sem vendas'); if(tipo==='pdf'){let w=window.open('','_blank'); let html=`<h2>Historico ${f||'Completo'}</h2><table border=1 cellpadding=6 style="width:100%;border-collapse:collapse"><tr><th>Data</th><th>Hora</th><th>Produto</th><th>Valor</th></tr>${lista.map(v=>`<tr><td>${v.dataBR}</td><td>${v.hora}</td><td>${v.nome}</td><td>${v.valor}</td></tr>`).join('')}</table><script>print()<\/script>`; w.document.write(html); w.document.close();}}
+// ATUALIZAR
+  
+const VERSAO_ATUAL = "2.0";
+
+const versaoSalva = localStorage.getItem('versao_loja');
+
+if (versaoSalva !== VERSAO_ATUAL) {
+
+    console.log("Atualizando Loja Bissau...");
+
+    localStorage.setItem('versao_loja', VERSAO_ATUAL);
+
+    console.log("Sistema atualizado para versão " + VERSAO_ATUAL);
+
+} else {
+
+    console.log("Loja Bissau já está atualizada.");
+
+}
 
 verificarTrava(); setLang(lang); mostrar(); mostrarHist();
 </script>
